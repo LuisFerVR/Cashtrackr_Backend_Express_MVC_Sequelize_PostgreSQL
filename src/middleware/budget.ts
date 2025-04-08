@@ -1,5 +1,5 @@
 import { NextFunction,Request, Response } from "express";
-import { param, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 import Budget from "../models/Budget";
 
 declare global {
@@ -33,6 +33,26 @@ export const validateBudgetExists = async (req:Request, res:Response,next: NextF
         req.budget = budget;
 
         next();
+        
+    } catch (e) {
+        const error = new Error("Hubo un error al obtener el presupuesto");
+        res.status(500).json({message:error.message});
+    }
+}
+
+export const validateBudgetInputs = async (req:Request, res:Response,next: NextFunction) =>{
+    try {
+        await body("name")
+            .notEmpty()
+            .withMessage("El nombre del presupuesto no puede ir vacio").run(req);
+            
+        await body("amount")
+            .notEmpty()
+            .withMessage("La cantidad del presupuesto no puede ir vacio")
+            .isNumeric().withMessage("La cantidad del presupuesto debe ser un numero")
+            .custom(amount => amount > 0).withMessage("La cantidad del presupuesto debe ser mayor a 0").run(req);
+        
+            next();
         
     } catch (e) {
         const error = new Error("Hubo un error al obtener el presupuesto");
