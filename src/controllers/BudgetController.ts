@@ -28,56 +28,17 @@ export class BudgetController {
     }
 
     static getById = async (req:Request, res:Response) =>{
-        try {
-            const {id} = req.params;
-            const budget = await Budget.findByPk(id);
-
-            if(!budget) {
-                res.status(404).json({message:`No se encontro el presupuesto con id: ${id}`});
-            }
-
-            res.status(200).json(budget);
-            
-        } catch (e) {
-            const error = new Error("Hubo un error al obtener el presupuesto");
-            res.status(500).json({message:error.message});
-        }
+        res.status(200).json(req.budget);
     }
 
     static updateById = async (req:Request, res:Response) =>{
-        try {
-            const {id} = req.params;
-            const budget = await Budget.findByPk(id);
-
-            if(!budget) {
-                res.status(404).json({message:`No se encontro el presupuesto con id: ${id}`});
-            }
-
-            await budget.update(req.body);
-            res.status(200).json('Presupuesto actualizado correctamente');
-
-        } catch (e) {
-            const error = new Error("Hubo un error al obtener el presupuesto");
-            res.status(500).json({message:error.message});
-        }
+        await req.budget.update(req.body);
+        res.status(200).json('Presupuesto actualizado correctamente');
     }
 
     static deleteById = async (req:Request, res:Response) => {
-        try {
-            const {id} = req.params;
-            const budget = await Budget.findByPk(id);
-
-            if(!budget) {
-                res.status(404).json({message:`No se encontro el presupuesto con id: ${id}`});
-            }
-
-            await budget.destroy();
-            res.status(200).json('Presupuesto eliminado correctamente');
-
-        } catch (e) {
-            const error = new Error("Hubo un error al obtener el presupuesto");
-            res.status(500).json({message:error.message});
-        }
+        await req.budget.destroy();
+        res.status(200).json('Presupuesto eliminado correctamente');
     }
 
 }
