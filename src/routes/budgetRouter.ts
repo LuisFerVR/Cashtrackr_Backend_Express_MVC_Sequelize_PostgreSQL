@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { BudgetController } from "../controllers/BudgetController";
-import { body, param } from "express-validator";
 import { handleInputErrors } from "../middleware/validation";
 import { validateBudgetExists, validateBudgetId, validateBudgetInputs } from "../middleware/Budget";
 const router = Router();
 
-router.param('id',validateBudgetId);
-router.param('id',validateBudgetExists);
+router.param('budgetId',validateBudgetId);
+router.param('budgetId',validateBudgetExists);
 
 router.get("/", BudgetController.getAll);
 
@@ -16,14 +15,16 @@ router.post("/",
     ,BudgetController.create
 );
 
-router.get('/:id',BudgetController.getById);
+router.get('/:budgetId',BudgetController.getById);
 
-router.put('/:id',
+router.put('/:budgetId',
     validateBudgetInputs
     ,handleInputErrors
     ,BudgetController.updateById
 );
 
-router.delete('/:id',BudgetController.deleteById);
+router.delete('/:budgetId',BudgetController.deleteById);
+
+//Router para gastos
 
 export default router;
