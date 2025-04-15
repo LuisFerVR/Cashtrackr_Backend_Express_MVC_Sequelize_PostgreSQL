@@ -3,6 +3,7 @@ import { AuthController } from "../controllers/AuthController";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../middleware/validation";
 import { limiter } from "../config/limiter";
+import { autenticate } from "../middleware/auth";
 
 const router = Router();
 router.use(limiter);
@@ -23,7 +24,7 @@ router.post('/confirm-account',
     AuthController.confirmAccount
 )
 
-router.post('login',
+router.post('/login',
     body('email')
         .isEmail()
         .withMessage('Correo inválido') ,
@@ -61,4 +62,7 @@ router.post('/reset-password/:token',
     handleInputErrors,
     AuthController.resetPasswordWithToken
 )
+
+router.get('/user', autenticate, AuthController.user)
+
 export default router;

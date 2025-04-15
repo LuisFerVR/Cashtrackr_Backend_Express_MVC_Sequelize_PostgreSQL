@@ -4,7 +4,6 @@ import { comparePassword, hashPassword } from '../utils/auth';
 import { generateToken } from '../utils/token';
 import { AuthEmails } from '../emails/AuthEmails';
 import { generateJWT } from '../utils/jwt';
-
 export class AuthController {
     static createAccount = async(req:Request, res:Response) => {
 
@@ -169,5 +168,9 @@ export class AuthController {
             const error = new Error('Error al restablecer la contraseña')
             res.status(500).json({ error: error.message })
         }
+    }
+
+    static user = (req:Request, res:Response) => {
+        res.json(req.user);
     }
 }
