@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthController } from "../controllers/AuthController";
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 import { handleInputErrors } from "../middleware/validation";
 import { limiter } from "../config/limiter";
 
@@ -24,7 +24,7 @@ router.post('/confirm-account',
 )
 
 router.post('login',
-    body('emali')
+    body('email')
         .isEmail()
         .withMessage('Correo inválido') ,
     body('password').notEmpty().withMessage('La contraseña no puede estar vacía'),
@@ -32,4 +32,33 @@ router.post('login',
     AuthController.login
 )
 
+router.post('/forgot-password', 
+    body('email')
+        .isEmail()
+        .withMessage('Correo inválido') ,
+    handleInputErrors,
+    AuthController.forgotPassword
+);
+
+router.post('/validate-token',
+    body('token')
+        .notEmpty()
+        .isLength({min:5, max:6})
+        .withMessage('El token no es válido'),
+    handleInputErrors,
+    AuthController.validateToken
+)
+
+router.post('/reset-password/:token',
+    param('token')
+        .notEmpty()
+        .isLength({min:6,max:6})
+        .withMessage('El token no es válido'),
+    body('password')
+        .notEmpty()
+        .isLength({ min: 8 })
+        .withMessage('La contraseña debe tener al menos 8 caracteres'),
+    handleInputErrors,
+    AuthController.resetPasswordWithToken
+)
 export default router;

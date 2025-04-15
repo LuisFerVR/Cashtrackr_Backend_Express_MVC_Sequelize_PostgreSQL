@@ -1,4 +1,5 @@
 import { transport } from "../config/nodemailer"
+import User from "../models/User";
 
 type EmailType = {
     name:string,
@@ -21,6 +22,22 @@ export class AuthEmails {
         })
 
         console.log('Email sent: %s', email.messageId);
+        
+    }
+
+    static sendPasswordResetToken = async (user:EmailType) => {
+        const email = await transport.sendMail({
+            from: 'CashTracker <admin@cashtrackr.com>',
+            to: user.email,
+            subject: 'Reestablece tu contraseña en CashTracker',
+            html : `
+                <p>Hola ${user.name},has solicitado restablecer tu contraseña cashtrackr</p>
+                <p>Visita el siguiente enlace:</p>
+                <a href="#">Restablecer tu cuenta</a>
+                <p>E ingresa el siguiente código:<b>${user.token}</b></p>
+            `
+        })
+        console.log('token de reestablecimiento de contraseña enviado: %s', email.messageId);
         
     }
 }
