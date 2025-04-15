@@ -63,6 +63,28 @@ router.post('/reset-password/:token',
     AuthController.resetPasswordWithToken
 )
 
-router.get('/user', autenticate, AuthController.user)
+router.get('/user', autenticate, AuthController.user);
+
+router.post('/update-password',
+    body('current_password')
+        .notEmpty()
+        .withMessage('La contraseña actual no puede estar vacía'),
+    body('password')
+        .notEmpty()
+        .isLength({ min: 8 })
+        .withMessage('La contraseña nueva es muy corta, debe tener al menos 8 caracteres'),
+    handleInputErrors,
+    autenticate,
+    AuthController.updateCurrentUserPassword
+)
+
+router.post('/check-password',
+    body('password')
+        .notEmpty()
+        .withMessage('La contraseña no puede estar vacía'),
+    handleInputErrors,
+    autenticate,
+    AuthController.checkPassword
+)
 
 export default router;
