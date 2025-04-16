@@ -15,7 +15,7 @@ export class BudgetController {
             });
             res.status(200).json(budgets);
         } catch (error) {
-            res.status(500).json({message:"Hubo un error al obtener los presupuestos"});
+            res.status(500).json({error:"Hubo un error al obtener los presupuestos"});
         }
     }
 

@@ -60,4 +60,20 @@ beforeEach(()=>{
         expect(res.statusCode).toBe(200)
         expect(res.status).not.toBe(404)
     })
+
+    it('should handle errors when fetching budgets', async ()=> {
+        const req = createRequest({
+            method: "GET",
+            url: "/api/budgets",
+            user: {id:1}
+        })
+
+        const res = createResponse();
+        (Budget.findAll as jest.Mock).mockRejectedValue(Error)
+
+        await BudgetController.getAll(req,res);
+
+        expect(res.statusCode).toBe(500);
+        expect(res._getJSONData()).toEqual({error:"Hubo un error al obtener los presupuestos"})
+    })
 })
