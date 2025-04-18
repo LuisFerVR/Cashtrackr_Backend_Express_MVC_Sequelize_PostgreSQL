@@ -28,6 +28,7 @@ export const validateBudgetExists = async (req:Request, res:Response,next: NextF
 
         if(!budget) {
             res.status(404).json({message:`No se encontro el presupuesto con budgetId: ${budgetId}`});
+            return;
         }
 
         req.budget = budget;
@@ -64,6 +65,7 @@ export function hasAcces(req:Request, res:Response, next: NextFunction) {
     if(req.budget.userId !== req.user.id){
         const error = new Error("Acción no válida");
         res.status(403).json({message:error.message});
+        return;
     }
     next();
 
