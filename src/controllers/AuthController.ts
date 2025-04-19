@@ -19,7 +19,7 @@ export class AuthController {
 
         try {
 
-            const user = new User(req.body);
+            const user = await User.create(req.body);
             user.password= await hashPassword(password);
             user.token = generateToken();
             await user.save();
@@ -32,11 +32,7 @@ export class AuthController {
 
             res.status(201).json('Usuario creado correctamente');
         } catch (error) {
-            console.log( error);
-            
-
             res.status(500).json({ error: 'Error en el servidor al crear su cuenta' })
-
         }
     }
 
