@@ -43,17 +43,20 @@ describe("Authentication - Create Account", () => {
         expect(response.body.errors[0].msg).toBe("La contraseña debe tener al menos 8 caracteres")
     })
 
-    it("should register a new user successfully", async () => {
+    it("should return 409 code when a user is already registered", async () => {
         const userData = {
-            "name": "Luis",
-            "email": "nam00@gmail.com",
-            "password": "12345678"
+            "name":"test",
+            "password":"12345678",
+            "email":"tets@gmail.com"
         };
 
         const response = await request(app).post("/api/auth/create-acount").send(userData);
         
-        expect(response.status).toBe(201);
+        expect(response.status).toBe(409);
+        expect(response.body).toHaveProperty("error");
+        expect(response.body.error).toBe("El correo electrónico ya está en uso");
         expect(response.status).not.toBe(400);
+        expect(response.status).not.toBe(201);
         expect(response.body).not.toHaveProperty("errors");
     },10000)
 });
