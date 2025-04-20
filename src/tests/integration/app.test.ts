@@ -43,10 +43,10 @@ describe("Authentication - Create Account", () => {
         expect(response.body.errors[0].msg).toBe("La contraseña debe tener al menos 8 caracteres")
     })
 
-    it("should return 201 when the user is save", async () => {
+    it("should register a new user successfully", async () => {
         const userData = {
             "name": "Luis",
-            "email": "nam0@gmail.com",
+            "email": "nam00@gmail.com",
             "password": "12345678"
         };
 
