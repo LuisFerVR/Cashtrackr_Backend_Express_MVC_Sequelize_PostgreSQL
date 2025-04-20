@@ -21,7 +21,13 @@ export class AuthController {
 
             const user = await User.create(req.body);
             user.password= await hashPassword(password);
-            user.token = generateToken();
+            const token = generateToken();
+            user.token = token;
+
+            if(process.env.NODE_ENV !== 'production') {
+                globalThis.cashTrackrConfirmationToken = token;
+            }
+
             await user.save();
 
             await AuthEmails.sendConfirmationEmail({
@@ -45,8 +51,6 @@ export class AuthController {
             const {token} = req.body;
             const user = await User.findOne({ where: { token }});
 
-            console.log(token,user);
-    
             if(!user){
                 const error = new Error('Token no válido')
                 res.status(401).json({ error: error.message })
@@ -56,7 +60,7 @@ export class AuthController {
             user.confirmed = true;
             user.token = null;
             await user.save();
-            res.json({user});
+            res.json("Cuenta confirmada correctamente, ya puede iniciar sesión");
 
         } catch (e) {
             console.log(e);

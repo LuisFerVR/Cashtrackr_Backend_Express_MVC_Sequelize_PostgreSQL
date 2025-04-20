@@ -2,7 +2,7 @@ import { createRequest, createResponse } from "node-mocks-http";
 import { validateExpenseExists } from "../../../middleware/expense";
 import Expense from "../../../models/Expense";
 import { expenses } from "../../mocks/expenses";
-import { hasAcces } from "../../../middleware/Budget";
+import { hasAcces } from "../../../middleware/budget";
 import { budgets } from "../../mocks/Budget";
 jest.mock("../../../models/Expense", () => ({
     findByPk: jest.fn(),

@@ -1,8 +1,7 @@
 import { createRequest, createResponse } from "node-mocks-http"
-import { validateBudgetExists } from "../../../middleware/Budget";
+import {  hasAcces as hasAccess, validateBudgetExists } from "../../../middleware/budget";
 import Budget from "../../../models/Budget";
 import { budgets } from "../../mocks/Budget";
-import { hasAcces as hasAccess } from "../../../middleware/Budget";
 
 jest.mock('../../../models/Budget.ts', () => ({
     findByPk: jest.fn(),
