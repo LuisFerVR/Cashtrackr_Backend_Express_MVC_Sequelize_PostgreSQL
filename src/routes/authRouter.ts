@@ -10,8 +10,8 @@ router.use(limiter);
 
 router.post('/create-acount',
     body('name').notEmpty().withMessage('El nombre no puede estar vacío'),
-    body('password').notEmpty().isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
-    body('email').notEmpty().isEmail().withMessage('El correo electrónico no es válido'),
+    body('password').isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
+    body('email').isEmail().withMessage('El correo electrónico no es válido'),
     handleInputErrors,
     AuthController.createAccount
 );

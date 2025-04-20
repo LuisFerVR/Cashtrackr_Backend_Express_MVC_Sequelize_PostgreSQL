@@ -1,9 +1,10 @@
 import { createRequest, createResponse } from "node-mocks-http";
 import { AuthController } from "../../../controllers/AuthController";
 import User from "../../../models/User";
-import { hashPassword } from "../../../utils/auth";
+import { comparePassword, hashPassword } from "../../../utils/auth";
 import { generateToken } from "../../../utils/token";
 import { AuthEmails } from "../../../emails/AuthEmails";
+import { generateJWT } from "../../../utils/jwt";
 
 // Mock explícito para que las funciones existan correctamente
 jest.mock("../../../models/User", () => ({
@@ -16,7 +17,8 @@ jest.mock("../../../models/User", () => ({
 }));
 
 jest.mock("../../../utils/auth", () => ({
-  hashPassword: jest.fn()
+  hashPassword: jest.fn(),
+  comparePassword: jest.fn()
 }));
 
 jest.mock("../../../utils/token", () => ({
@@ -28,6 +30,10 @@ jest.mock("../../../emails/AuthEmails", () => ({
     sendConfirmationEmail: jest.fn()
   }
 }));
+
+jest.mock("../../../utils/jwt",() => ({
+  generateJWT: jest.fn()
+}))
 
 describe("AuthController.createAccount", () => {
   beforeEach(() => {
@@ -101,3 +107,114 @@ describe("AuthController.createAccount", () => {
     expect(res._getJSONData()).toEqual("Usuario creado correctamente");
   });
 });
+
+describe("AuthController.login", () => {
+  it("should return 404 if user is not found", async () => {
+    (User.findOne as jest.Mock).mockResolvedValue(null);
+
+    const req = createRequest({
+      method: "POST",
+      url: "/api/auth/login",
+      body: {
+        email: "test@example.com",
+        password: "password123"
+      }
+    });
+
+    const res = createResponse();
+
+    await AuthController.login(req, res);
+
+    expect(res.statusCode).toBe(404);
+    expect(res._getJSONData()).toHaveProperty("error", "Usuario no encontrado");
+  });
+
+  it("should return 403 if the account has not been confirmed", async () => {
+    (User.findOne as jest.Mock).mockResolvedValue({
+      id:1,
+      email:"tes@test.com",
+      password: "password123",
+      confirmed: false,
+    });
+
+    const req = createRequest({
+      method: "POST",
+      url: "/api/auth/login",
+      body: {
+        email: "test@example.com",
+        password: "password123"
+      }
+    });
+
+    const res = createResponse();
+
+    await AuthController.login(req, res);
+
+    expect(res.statusCode).toBe(403);
+    expect(res._getJSONData()).toHaveProperty("error", "La cuenta no ha sido confirmada");
+  });
+
+  it("should return 403 if password is incorrect", async () => {
+    const userMock = {
+      id:1,
+      email:"tes@test.com",
+      password: "password123",
+      confirmed: true,
+    };
+
+    (User.findOne as jest.Mock).mockResolvedValue(userMock);
+
+    const req = createRequest({
+      method: "POST",
+      url: "/api/auth/login",
+      body: {
+        email: "test@example.com",
+        password: "password123"
+      }
+    });
+
+    const res = createResponse();
+    (comparePassword as jest.Mock).mockResolvedValue(false);
+
+    await AuthController.login(req, res);
+
+    expect(res.statusCode).toBe(403);
+    expect(res._getJSONData()).toHaveProperty("error", "Contraseña incorrecta");
+    expect(comparePassword).toHaveBeenCalledTimes(1);
+    expect(comparePassword).toHaveBeenCalledWith(req.body.password,userMock.password);
+  });
+
+  it("should return a JWT if authentication is successful", async () => {
+    const userMock = {
+      id:1,
+      email:"tes@test.com",
+      password: "password123",
+      confirmed: true,
+    };
+
+    (User.findOne as jest.Mock).mockResolvedValue(userMock);
+
+    const req = createRequest({
+      method: "POST",
+      url: "/api/auth/login",
+      body: {
+        email: "test@example.com",
+        password: "password123"
+      }
+    });
+
+    const res = createResponse();
+
+    const fake_JWT = "fake_jwt";
+    
+    (comparePassword as jest.Mock).mockResolvedValue(true);
+    (generateJWT as jest.Mock).mockReturnValue(fake_JWT);
+    await AuthController.login(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(res._getJSONData()).toEqual(fake_JWT);
+    expect(generateJWT).toHaveBeenCalledTimes(1);
+    expect(generateJWT).toHaveBeenCalledWith(userMock.id);
+
+  });
+})

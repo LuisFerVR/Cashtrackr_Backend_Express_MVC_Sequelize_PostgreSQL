@@ -2,16 +2,16 @@ import express from 'express'
 import colors from 'colors'
 import morgan from 'morgan'
 import { db } from './config/db'
-import budgetRouter from './routes/BudgetRouter'
+import budgetRouter from '../src/routes/budgetRouter'
 import authRouter from './routes/authRouter'
 
-async function connectDB() {
+export async function connectDB() {
     try {
         await db.authenticate();
         db.sync();
-        console.log(colors.cyan.bold('DB is connected'))
+        // console.log(colors.cyan.bold('DB is connected'))
     } catch (error) {
-        console.log(colors.red.bold('DB connection error: '), error)
+        // console.log(colors.red.bold('DB connection error: '), error)
     }
 }
 

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { BudgetController } from "../controllers/BudgetController";
 import { handleInputErrors } from "../middleware/validation";
-import { hasAcces, validateBudgetExists, validateBudgetId, validateBudgetInputs } from "../middleware/Budget";
+import { hasAcces, validateBudgetExists, validateBudgetId, validateBudgetInputs } from "../middleware/budget";
 import { ExpensesController } from "../controllers/ExpenseController";
 import { validateExpenseExists, validateExpenseId, validateExpenseInputs } from "../middleware/expense";
 import { autenticate } from "../middleware/auth";
