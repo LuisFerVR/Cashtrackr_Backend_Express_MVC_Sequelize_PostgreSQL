@@ -256,3 +256,47 @@ describe("Authentication - Login", () => {
         expect(JWT).toHaveBeenCalledWith(500);
     })
 })
+
+describe("GET /api/budgets", () => {
+    let jwt:string;
+
+    beforeAll(() => {
+        jest.restoreAllMocks(); //Restautra las funciones de los jest.spyOn a su implementación original
+    });
+
+    beforeAll(async () => {
+        const response = await request(app).post("/api/auth/login").send({
+            email:"test@gmail.com",
+            password:"12345678"
+        });
+        console.log("Response: ", response.body);
+        
+        jwt = response.body;
+        expect(response.status).toBe(200);
+    });
+
+    it("should reject unauthenticated access to budgets without a jwt", async () => {
+        const response = await request(app).get("/api/budgets");
+
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("No autorizado");
+
+    })
+
+    it("should reject unauthenticated access to budgets without a valid jwt", async () => {
+        const response = await request(app).get("/api/budgets").auth("invalid-jwt",{type:'bearer'});
+
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("Token inválido");
+
+    })
+
+    it("should allow authenticated access to budgets with a valid jwt", async () => {
+        const response = await request(app).get("/api/budgets").auth(jwt,{type:'bearer'});
+
+        expect(response.status).not.toBe(401);
+        expect(response.body.error).not.toBe("No autorizado");
+        expect(response.body).toHaveLength(0);
+
+    })
+})
