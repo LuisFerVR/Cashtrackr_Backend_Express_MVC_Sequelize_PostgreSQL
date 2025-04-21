@@ -328,3 +328,51 @@ describe("POST /api/budgets", () => {
 
     })
 })
+
+describe("GET /api/budgets/:budgetId", () => {
+
+    beforeAll(async () => {
+        await authenticateUser();
+    });
+
+    it("should reject unauthenticated get request to budget id without a jwt", async () => {
+        const response = await request(app).get("/api/budgets/1");
+
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("No autorizado");
+
+    })
+
+    it("should return 400 bad request when url is not valid", async () => {
+        const response = await request(app).get("/api/budgets/id_not_valid").auth(jwt, {type:'bearer'});
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toBeTruthy();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].msg).toBe("budgetId inválido");
+        expect(response.status).not.toBe(401);
+        expect(response.body.error).not.toBe("No autorizado");
+
+    })
+
+    it("should return 404 bad request when id is not found", async () => {
+        const response = await request(app).get("/api/budgets/500").auth(jwt, {type:'bearer'});
+        
+        expect(response.status).toBe(404);
+        expect(response.body.message).toBe(`No se encontro el presupuesto con budgetId: ${500}`);
+        expect(response.status).not.toBe(401);
+        expect(response.body.error).not.toBe("No autorizado");
+
+    })
+
+    it("should return a single budget by id", async () => {
+        const response = await request(app).get("/api/budgets/1").auth(jwt, {type:'bearer'});
+        
+        expect(response.status).toBe(200);
+        expect(response.status).not.toBe(400);
+        expect(response.status).not.toBe(401);
+        expect(response.status).not.toBe(404);
+        expect(response.body.error).not.toBe("No autorizado");
+
+    })
+})

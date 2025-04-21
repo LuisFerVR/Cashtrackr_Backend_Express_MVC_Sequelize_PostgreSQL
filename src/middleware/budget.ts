@@ -11,7 +11,7 @@ declare global {
 }
 
 export const validateBudgetId = async (req:Request, res:Response,next: NextFunction) =>{
-    await param('budgetId').isInt().withMessage("budgetId inválido").custom(id => id > 0).withMessage("budgetId inválido").run(req);
+    await param('budgetId').isInt().bail().withMessage("budgetId inválido").custom(id => id > 0).bail().withMessage("budgetId inválido").run(req);
 
     let errors = validationResult(req)
     if (!errors.isEmpty()) {
