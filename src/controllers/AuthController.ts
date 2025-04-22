@@ -39,6 +39,8 @@ export class AuthController {
             res.status(201).json('Usuario creado correctamente');
             return
         } catch (error) {
+            console.log(error);
+            
             res.status(500).json({ error: 'Error en el servidor al crear su cuenta' })
             return
         }

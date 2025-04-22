@@ -55,6 +55,8 @@ describe("Authentication - Create Account", () => {
         };
 
         const response = await request(app).post("/api/auth/create-acount").send(userData);
+        console.log("Response: ", response.body);
+        
         
         expect(response.status).toBe(201);
         expect(response.status).not.toBe(400);
@@ -109,7 +111,6 @@ describe("Authentication - Account confirmation with token", () => {
 
     it('should confirm account with a valid token', async () => {
         const token = globalThis.cashTrackrConfirmationToken;
-        console.log("Token: ", token);
         
         const response = await request(app).post("/api/auth/confirm-account").send({ token });
 
@@ -421,6 +422,39 @@ describe("PUT /api/budgets/:budgetId", () => {
 
         expect(response.status).toBe(200);
         expect(response.body).toBe("Presupuesto actualizado correctamente");
+
+    })
+})
+
+describe("DELETE /api/budgets/:budgetId", () => {
+
+    beforeAll(async () => {
+        await authenticateUser();
+    });
+
+    it("should reject unauthenticated put request to budget id without a jwt", async () => {
+        const response = await request(app).delete("/api/budgets/1");
+
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("No autorizado");
+
+    })
+
+    it("should return 404 not found when a budget doesnt exists", async () => {
+        const response = await request(app).delete("/api/budgets/3000").auth( jwt ,{type:'bearer'});
+
+        expect(response.status).toBe(404);
+        
+        expect(response.body.message).toBe(`No se encontro el presupuesto con budgetId: ${3000}`);
+
+    })
+
+    it("should delete a budget and return a success message", async () => {
+        const response = await request(app).delete("/api/budgets/1").auth( jwt ,{type:'bearer'});
+        
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBe("Presupuesto eliminado correctamente");
 
     })
 })
