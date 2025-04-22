@@ -327,6 +327,18 @@ describe("POST /api/budgets", () => {
         expect(response.body.errors).toHaveLength(4);
 
     })
+
+    it("should display success message when the budget is save", async () => {
+        const response = await request(app).post("/api/budgets").auth(jwt,{type:'bearer'}).send({
+            name:"Test Budget",
+            amount: 1000,
+        });
+
+        expect(response.status).toBe(201);
+        expect(response.body).toBe("Presupuesto creado correctamente");
+    })
+
+
 })
 
 describe("GET /api/budgets/:budgetId", () => {
@@ -373,6 +385,42 @@ describe("GET /api/budgets/:budgetId", () => {
         expect(response.status).not.toBe(401);
         expect(response.status).not.toBe(404);
         expect(response.body.error).not.toBe("No autorizado");
+
+    })
+})
+
+describe("PUT /api/budgets/:budgetId", () => {
+
+    beforeAll(async () => {
+        await authenticateUser();
+    });
+
+    it("should reject unauthenticated put request to budget id without a jwt", async () => {
+        const response = await request(app).put("/api/budgets/1");
+
+        expect(response.status).toBe(401);
+        expect(response.body.error).toBe("No autorizado");
+
+    })
+
+    it("should display validation errors if the form is empty", async () => {
+        const response = await request(app).put("/api/budgets/1").auth( jwt ,{type:'bearer'}).send({});
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toBeTruthy();
+        expect(response.body.errors).toHaveLength(4);
+
+    })
+
+    it("should update a budget by id and return a success message", async () => {
+        const response = await request(app).put("/api/budgets/1").auth( jwt ,{type:'bearer'}).send({
+            name:"Updated Budget",
+            amount: 1000,
+        });
+        
+
+        expect(response.status).toBe(200);
+        expect(response.body).toBe("Presupuesto actualizado correctamente");
 
     })
 })

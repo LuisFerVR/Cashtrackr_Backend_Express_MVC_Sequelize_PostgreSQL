@@ -53,7 +53,7 @@ export const validateBudgetInputs = async (req:Request, res:Response,next: NextF
             .isNumeric().withMessage("La cantidad del presupuesto debe ser un número")
             .custom(amount => amount > 0).withMessage("La cantidad del presupuesto debe ser mayor a 0").run(req);
         
-            next();
+        next();
         
     } catch (e) {
         const error = new Error("Hubo un error al obtener el presupuesto");
