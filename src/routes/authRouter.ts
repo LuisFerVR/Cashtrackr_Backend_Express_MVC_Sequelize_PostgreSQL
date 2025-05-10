@@ -65,6 +65,8 @@ router.post('/reset-password/:token',
 
 router.get('/user', autenticate, AuthController.user);
 
+router.put('/user', autenticate, AuthController.updateUser);
+
 router.post('/update-password',
     body('current_password')
         .notEmpty()
