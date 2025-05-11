@@ -4,7 +4,7 @@ import { db } from '../config/db';
 const clearData = async () => {
     try {
         await db.sync({force:true});
-        console.log('Data cleaned successfully');
+        console.log('Base de datos truncada');
         exit(0);
     } catch (error) {
         //console.error('Error cleaning data:', error);
